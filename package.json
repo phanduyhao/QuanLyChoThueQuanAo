@@ -1,0 +1,33 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "run": "php artisan serve",
+        "Create Storage image": "php artisan storage:link",
+        "makeController": "php artisan make:controller ProductController ",
+        "makeController Full Class": "php artisan make:controller RoleController --resource",
+        "makeModel-Controller-Migration": "php artisan make:model Chothue_Product -mcr",
+        "RunPHPCommand": " php artisan tinker ",
+        "CreatePass": "echo bcrypt('12345')",
+        "CreateMigration": "php artisan make:migration Chothue_Product_Update",
+        "makeMigration": "php artisan migrate",
+        "CreateSeeder": " php artisan make:seeder ProductSeeder    ",
+        "RunSeeder": "php artisan db:seed --class=ProductSeeder",
+        "makeOnlyMigration": "php artisan migrate --path=database/migrations/2024_10_03_181353_chothue__product__update.php",
+        "makeFormRequest": "php artisan make:request Menu/CreateFormRequest",
+        "list": "php artisan route:list",
+        "storage": "php artisan storage:link",
+        "Package do mat khau": "php artisan make:middleware ThrottleLogins",
+        "Install Toast": "npm install toastr --save"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.6",
+        "axios": "^1.7.4",
+        "bootstrap": "^5.2.3",
+        "laravel-vite-plugin": "^1.0",
+        "sass": "^1.56.1",
+        "vite": "^5.0"
+    }
+}
