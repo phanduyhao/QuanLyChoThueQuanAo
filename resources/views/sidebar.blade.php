@@ -135,5 +135,19 @@
 
             </ul>
         </li>
+        <li class='menu-item'>
+            <a href='{{route("chothues.index")}}' class='menu-link'>
+                <i class='menu-icon tf-icons bx bx-food-menu'></i>
+                <div data-i18n='Layouts'>Nhập kho</div>
+            </a>
+            <ul class='menu-sub ms-4'>
+                <li class='menu-item'>
+                    <a href='{{route("chothues.index")}}' class='menu-link'>
+                        <div data-i18n='Without menu'>Nhập kho</div>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
     </ul>
 </aside>

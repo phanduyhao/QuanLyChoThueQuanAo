@@ -18,7 +18,8 @@ class UserController extends Controller
     public function index()
     {
         $roles = Role::all();
-        $users = User::paginate(20)->Where('Xoa', null);
+        $users = User::where('Xoa', null)->paginate(20);
+
         return view('users.index',compact('users', 'roles'),[
             'title' => 'Tài khoản quản trị'
         ]);

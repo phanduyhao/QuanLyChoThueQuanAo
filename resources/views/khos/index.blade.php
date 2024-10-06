@@ -35,14 +35,17 @@
                                     />
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class='form-label'for='basic-default-email'>Sản phẩm</label>
+                                    <label class='form-label' for='basic-default-email'>Sản phẩm</label>
                                     <select name="id_product" class="form-control input-field" id="product" data-require="Mời chọn sản phẩm">
                                         <option value="">Chọn sản phẩm</option>
                                         @foreach($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->product_name }}</option>
+                                            <option value="{{ $product->id }}">
+                                                {{ $product->product_name }} - Còn lại: {{ $product->available_quantity }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
+                                
                                 <div class='mb-3'>
                                     <label
                                         class='form-label'
@@ -87,7 +90,9 @@
                         <th>ID Kho</th>
                         <th>Tên kho</th>
                         <th>Sản phẩm</th>
-                        <th>Số lượng</th>
+                        <th>Tổng Số lượng</th>
+                        <th>Số lượng đang rảnh</th>
+                        <th>Số lượng đang cho thuê</th>
                         <th>Mô tả</th>
                         <th>Thời gian</th>
                         <th>Thao tác</th>
@@ -100,8 +105,9 @@
                             <td>{{$kho->id}}</td>
                             <td>{{$kho->title}}</td>
                             <td>{{$kho->Product->product_name??"Chưa có sản phẩm"}}</td>
-                            <td>{{$kho->quantity}}</td>
-                            <td>{{$kho->desc}}</td>
+                            <td>{{ $kho->total_quantity }}</td> <!-- Tổng số lượng -->
+                            <td>{{ $kho->quantity_available }}</td> <!-- Số lượng rảnh -->
+                            <td>{{ $kho->quantity_rented }}</td> <!-- Số lượng đang cho thuê -->                            <td>{{$kho->desc}}</td>
                             <td>{{$kho->updated_at}}</td>
                             <td class="">
                                     <button type="button" data-url="/khos/{{$kho->id}}" data-id="{{$kho->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$kho->id}}">Xóa</button>
@@ -134,6 +140,9 @@
                                 <h1 class="modal-title fs-5 text-danger" id="createKhoLabel"> </h1>
                             </div>
                             <div class="card-body">
+                                <div class="error">
+                                    @include('error')
+                                </div>
                                 <form method='post' action='' enctype="multipart/form-data" class="editKhoForm form-edit" id="form_khoAdmin_update">
                                     @method('PATCH')
                                     @csrf
@@ -155,7 +164,7 @@
                                         <select name="id_product" class="form-control input-field" id="product-edit" data-require="Mời chọn sản phẩm">
                                             <option value="">Chọn sản phẩm</option>
                                             @foreach($products as $product)
-                                                <option value="{{ $product->id }}">{{ $product->product_name }}</option>
+                                                <option value="{{ $product->id }}">{{ $product->product_name }} - Còn lại: {{ $product->available_quantity }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -203,9 +212,17 @@
     </div>
     <script>
         $(document).ready(function() {
+            // Kiểm tra nếu có lỗi khi tạo mới kho
             if ($('#createkho .alert-error').length > 0) {
-                // Nếu có, hiển thị modal
+                // Nếu có, hiển thị modal create
                 $('#createkho').modal('show');
+            }
+
+            // Kiểm tra session nếu có id của bản ghi đang chỉnh sửa bị lỗi
+            var editKhoId = "{{ session('edit_kho_id') }}";
+            if (editKhoId) {
+                // Hiển thị modal chỉnh sửa của bản ghi có id tương ứng
+                $('#editKho' + editKhoId).modal('show');
             }
             $('.btnEditKho').on('click', function() {
                 var khoID = $(this).data('id'); // Lấy ID từ nút Sửa

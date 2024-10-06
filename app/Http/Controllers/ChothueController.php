@@ -21,15 +21,31 @@ class ChothueController extends Controller
      */
     public function index()
     {
-        $perPage = 10; 
-        $products = Product::where('Xoa', null)->get();
-        $product_theokhos = Kho::where('Xoa', null)->get();
+        $perPage = 10;
+    
+        // Lấy danh sách các kho và tính toán số lượng còn lại của sản phẩm trong từng kho
+        $product_theokhos = Kho::where('Xoa', null)->get()->map(function ($kho) {
+            // Tính tổng số lượng sản phẩm đã cho thuê từ kho này
+            $totalRented = Chothue_Product::where('id_product_theokho', $kho->id)->sum('quantity');
+    
+            // Số lượng còn lại trong kho (tổng số lượng trong kho trừ đi số lượng đã cho thuê)
+            $availableQuantity = $kho->quantity - $totalRented;
+    
+            // Gán giá trị còn lại vào kho để hiển thị trong view
+            $kho->available_quantity = max(0, $availableQuantity); // Đảm bảo không âm
+    
+            return $kho;
+        });
+    
+        // Lấy danh sách các hóa đơn cho thuê
         $chothues = Chothue::where('Xoa', null)->paginate($perPage);
-        return view('chothues.index',compact('chothues','products','product_theokhos' ),[
+    
+        // Trả về view với dữ liệu đã tính toán
+        return view('chothues.index', compact('chothues', 'product_theokhos'), [
             'title' => 'Cho thuê'
         ]);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -63,17 +79,17 @@ class ChothueController extends Controller
             'thanh_tien.required' => 'Vui lòng nhập tổng tiền!',
             'khach_coc.required' => 'Vui lòng nhập số tiền khách cọc!'
         ]);
-
+    
         // Kiểm tra xem khách hàng với số điện thoại đã tồn tại chưa
         $customer = Customer::where('phone_number', $request->phone_number)->first();
-
+    
         if (!$customer) {
             $customer = new Customer;
             $customer->name = $request->name_customer;
             $customer->phone_number = $request->phone_number;
             $customer->save();
         }
-
+    
         // Tạo mới hóa đơn cho thuê
         $chothue = new Chothue;
         $chothue->id_customer = $customer->id;
@@ -81,21 +97,41 @@ class ChothueController extends Controller
         $chothue->thanh_tien = $request->thanh_tien;
         $chothue->khach_coc = $request->khach_coc;
         $chothue->id_nhanvien = Auth::user()->id;
+        $chothue->trangthai = 1;
         $chothue->save();
-
+    
         // Lưu thông tin nhiều sản phẩm trong bảng Chothue_Product
         foreach ($request->products as $product) {
+            // Tìm sản phẩm trong kho
+            $kho = Kho::find($product['id_product_theokho']);
+            $productDetail = $kho->Product;
+    
+            // Tính tổng số lượng sản phẩm đã có trong các kho (ngoại trừ kho hiện tại)
+            $totalInStock = Kho::where('Xoa', null)
+                                ->where('id_product', $productDetail->id)
+                                ->sum('quantity');
+    
+            // Kiểm tra nếu số lượng yêu cầu thuê vượt quá số lượng còn lại
+            $availableQuantity = $productDetail->quantity_origin - $totalInStock;
+    
+            if ($product['quantity'] > $availableQuantity) {
+                return redirect()->back()->withErrors([
+                    'quantity' => 'Số lượng sản phẩm (' . $productDetail->product_name . ') yêu cầu vượt quá số lượng còn lại trong kho! Bạn chỉ có thể thuê tối đa ' . $availableQuantity . ' cái.'
+                ]);
+            }
+    
+            // Lưu sản phẩm vào bảng Chothue_Product (không cập nhật số lượng kho)
             $chothueProduct = new Chothue_Product;
             $chothueProduct->id_chothue = $chothue->id;
             $chothueProduct->id_product_theokho = $product['id_product_theokho'];
             $chothueProduct->quantity = $product['quantity'];
             $chothueProduct->thanh_tien = $product['thanh_tien'];
-
             $chothueProduct->save();
         }
-
-        return redirect()->back()->with('success', 'Chothue đã được thêm thành công!');
+    
+        return redirect()->back()->with('success', 'Cho thuê đã được thêm thành công!');
     }
+    
 
     public function destroyProduct($id)
     {
@@ -135,9 +171,11 @@ class ChothueController extends Controller
     
         // Lấy danh sách sản phẩm từ bảng chothue_products theo id_chothue
         $products = Chothue_Product::join('khos', 'chothue_products.id_product_theokho', '=', 'khos.id')
-            ->where('chothue_products.id_chothue', $id)
-            ->select('khos.Product.id as product_id', 'khos.Product.product_name','chothue_products.id as chothue_product_id' , 'khos.Product.price_1_day', 'chothue_products.quantity', 'chothue_products.thanh_tien')
-            ->get();
+        ->join('products', 'khos.id_product', '=', 'products.id') // Kết nối bảng kho với bảng products
+        ->where('chothue_products.id_chothue', $id)
+        ->select('products.id as product_id', 'products.product_name','khos.title as title_kho', 'chothue_products.id as chothue_product_id', 'products.price_1_day', 'chothue_products.quantity', 'chothue_products.thanh_tien')
+        ->get();
+    
     
         // Trả về JSON bao gồm thông tin hóa đơn và danh sách sản phẩm
         return response()->json([
@@ -150,6 +188,7 @@ class ChothueController extends Controller
             'so_ngay_thue' => $chothue->so_ngay_thue,
             'thanh_tien' => $chothue->thanh_tien,
             'khach_coc' => $chothue->khach_coc,
+            'trangthai' => $chothue->trangthai, // Nếu có quan hệ 'trangthai'
             'nhanvien' => $chothue->nhanvien->name, // Nếu có quan hệ 'nhanvien'
             'updated_at' => $chothue->updated_at
         ]);
@@ -207,6 +246,7 @@ class ChothueController extends Controller
         $chothue->thanh_tien = $request->thanh_tien;
         $chothue->khach_coc = $request->khach_coc;
         $chothue->id_nhanvien = Auth::user()->id;
+        $chothue->trangthai = $request->trangthai;
         $chothue->save();
 
         // Lưu thông tin nhiều sản phẩm trong bảng Chothue_Product

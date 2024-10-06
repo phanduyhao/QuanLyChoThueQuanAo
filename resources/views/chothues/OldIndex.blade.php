@@ -79,11 +79,14 @@
                                 <div class='form-group mb-3 product-item'>
                                     <label for='product'>Sản phẩm</label>
                                     <select class="form-control product-select">
-                                        @foreach($products as $product)
-                                            <option value="{{ $product->id }}" data-price="{{ $product->price_1_day }}">{{ $product->product_name }}</option>
+                                        @foreach($product_theokhos as $product_theokho)
+                                            <option value="{{ $product_theokho->id }}" data-price="{{ $product_theokho->Product->price_1_day }}" data-available-quantity="{{ $product_theokho->available_quantity }}">
+                                                {{ $product_theokho->Product->product_name }} - {{ $product_theokho->title }} (Còn lại: {{ $product_theokho->available_quantity }})
+                                            </option>
                                         @endforeach
                                     </select>
                                     <input type="number" placeholder="Số lượng" class="form-control quantity-input mt-2" />
+                                    <span class="text-danger d-none error-message">Số lượng nhập vào vượt quá số lượng còn lại!</span>
                                 </div>
                             </div>
                             <button type="button" class="btn btn-secondary mt-2" id="add-more-product">Thêm sản phẩm khác</button>
@@ -95,6 +98,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div class="table-responsive text-nowrap">
                 <table class="table">
@@ -213,9 +217,10 @@
                                     <div class='form-group mb-3 edit-product-item'>
                                         <label for='product'>Sản phẩm</label>
                                         <select class="form-control product-select" id="edit-product-select">
-                                            @foreach($products as $product)
-                                                <option value="{{ $product->id }}" data-price="{{ $product->price_1_day }}">{{ $product->product_name }}</option>
-                                            @endforeach
+                                            @foreach($product_theokhos as $product_theokho)
+                                            <option value="{{ $product_theokho->id }}" data-price="{{ $product_theokho->Product->price_1_day }}" data-available-quantity="{{ $product_theokho->available_quantity }}">
+                                                {{ $product_theokho->Product->product_name }} - {{ $product_theokho->title }} (Còn lại: {{ $product_theokho->available_quantity }})
+                                            </option>                                            @endforeach
                                         </select>
                                         <input type="number" placeholder="Số lượng" id="edit-quantity-input" class="form-control quantity-input mt-2" />
                                     </div>
@@ -267,112 +272,144 @@
                 $('#addProductModal').modal('show');
             });
 
+            // Sự kiện khi nhấn nút "Thêm vào hóa đơn"
+            $('#addProductsToList').on('click', function(e) {
+                let isValid = true; // Biến kiểm tra tính hợp lệ toàn bộ
+                    let errorMessageShown = false; // Biến để đảm bảo chỉ hiển thị cảnh báo một lần
+
+                    // Lặp qua tất cả các sản phẩm trong modal
+                    $('.product-item').each(function() {
+                        const quantityInput = $(this).find('.quantity-input'); // Lấy thẻ input số lượng
+                        const quantity = parseInt(quantityInput.val()); // Số lượng nhập vào
+                        const availableQuantity = parseInt($(this).find('.product-select option:selected').data('available-quantity')); // Số lượng còn lại
+                        const errorMessage = $(this).find('.error-message'); // Lấy thẻ thông báo lỗi tương ứng với sản phẩm
+
+                        // Kiểm tra nếu số lượng nhập vào lớn hơn số lượng còn lại
+                        if (quantity > availableQuantity || isNaN(quantity)) {
+                            errorMessage.removeClass('d-none'); // Hiển thị thông báo lỗi dưới input
+                            isValid = false; // Đánh dấu không hợp lệ
+                            errorMessageShown = true; // Đảm bảo thông báo lỗi đã hiển thị
+                        } else {
+                            errorMessage.addClass('d-none'); // Ẩn thông báo lỗi nếu hợp lệ
+                        }
+                    });
+
+                    // Nếu có ít nhất một sản phẩm không hợp lệ, ngăn chặn việc tiếp tục
+                    if (!isValid) {
+                        e.preventDefault(); // Ngăn chặn form submit
+                        if (!errorMessageShown) {
+                            alert('Vui lòng kiểm tra lại số lượng các sản phẩm trước khi thêm vào hóa đơn.'); // Hiển thị thông báo lỗi chung
+                        }
+                        return;
+                    }else{
+                        $('#product-error').addClass('d-none');
+                            // Lấy số ngày thuê từ modal chính
+                            const soNgayThue = $('#so_ngay_thue').val();
+
+                            if (soNgayThue == '' || soNgayThue <= 0) {
+                                alert("Vui lòng nhập số ngày thuê hợp lệ.");
+                                return;
+                            }
+
+                            // Lặp qua từng sản phẩm trong modal phụ
+                            $('.product-item').each(function() {
+                                const productId = $(this).find('.product-select').val();
+                                const productText = $(this).find('.product-select option:selected').text();
+                                const pricePerDay = $(this).find('.product-select option:selected').data('price');
+                                const quantity = $(this).find('.quantity-input').val();
+
+                                if (productId && quantity > 0) {
+                                    const productWrapper = $('#product-wrapper');
+
+                                    // Kiểm tra nếu sản phẩm đã tồn tại dựa trên value của input hidden
+                                    const existingProduct = productWrapper.find(`input[name^="products"][name$="[id_product_theokho]"][value="${productId}"]`);
+
+                                    if (existingProduct.length < 1) {
+                                        // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào danh sách
+                                        const thanhTien = quantity * pricePerDay * soNgayThue; 
+                                        totalAmount += thanhTien; 
+
+                                        const newProduct = `
+                                            <div class='form-group mb-3 text-danger fw-bold product-item position-relative' data-price=${pricePerDay} data-product-index="${productIndex}">
+                                                <label for='product'>Sản phẩm: ${productText}</label>
+                                                <input type="hidden" name="products[${productIndex}][id_product_theokho]" value="${productId}">
+                                                <input type="hidden" name="products[${productIndex}][quantity]" value="${quantity}">
+                                                <input type="hidden" name="products[${productIndex}][thanh_tien]" value="${thanhTien}">
+                                                
+                                                <p>Số lượng: ${quantity} | Thành tiền: ${thanhTien.toLocaleString()} VND</p>
+                                                <button type="button" class="btn btn-danger badge position-absolute top-0 end-0 remove-product" data-product-index="${productIndex}">Xóa</button>
+
+                                            </div>
+                                        `;
+                                        productWrapper.append(newProduct);
+                                        productIndex++;
+                                    }
+                                }
+                            });
+
+                            // Xử lý xóa sản phẩm
+                            $('.remove-product').on('click', function() {
+                                // Lấy thông tin của sản phẩm cần xóa
+                                const productIndex = $(this).data('product-index');
+                                const productItem = $(`.product-item[data-product-index="${productIndex}"]`);
+                                const thanhTien = parseFloat(productItem.find('input[name$="[thanh_tien]"]').val());
+
+                                // Trừ thành tiền của sản phẩm này khỏi tổng thành tiền
+                                totalAmount -= thanhTien;
+
+                                // Đảm bảo totalAmount không âm và đặt về 0 nếu không còn sản phẩm
+                                totalAmount = totalAmount > 0 ? totalAmount : 0;
+
+                                // Cập nhật lại tổng thành tiền hiển thị
+                                $('#thanh_tien').text(Number(totalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                                $('#thanh_tien_input').val(totalAmount.toFixed(2));
+
+                                // Xóa sản phẩm khỏi giao diện
+                                productItem.remove();
+
+                                // Kiểm tra nếu không còn sản phẩm nào, đặt tổng tiền về 0
+                                if ($('#product-wrapper').children().length === 0) {
+                                    totalAmount = 0;
+                                    $('#thanh_tien').text('0 VND');
+                                    $('#thanh_tien_input').val(0);
+                                }
+                            });
+
+                            // Cập nhật tổng thành tiền
+                            totalAmount = totalAmount > 0 ? totalAmount : 0;
+                            $('#thanh_tien').text(Number(totalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                            $('#thanh_tien_input').val(totalAmount.toFixed(2));
+
+                            // Đóng modal sản phẩm
+                            $('#addProductModal').modal('hide');
+                    }
+                });
+
             // Thêm phần chọn sản phẩm mới khi bấm "Thêm sản phẩm khác"
             $('#add-more-product').on('click', function() {
                 const newProductSelect = `
                     <div class='form-group mb-3 product-item'>
                         <label for='product'>Sản phẩm</label>
                         <select class="form-control product-select">
-                            @foreach($products as $product)
-                                <option value="{{ $product->id }}" data-price="{{ $product->price_1_day }}">{{ $product->product_name }}</option>
+                            @foreach($product_theokhos as $product_theokho)
+                                <option value="{{ $product_theokho->id }}" data-price="{{ $product_theokho->Product->price_1_day }}" data-available-quantity="{{ $product_theokho->available_quantity }}">
+                                    {{ $product_theokho->Product->product_name }} - {{ $product_theokho->title }} (Còn lại: {{ $product_theokho->available_quantity }})
+                                </option>
                             @endforeach
                         </select>
                         <input type="number" placeholder="Số lượng" class="form-control quantity-input mt-2" />
+                        <span class="text-danger d-none error-message">Số lượng nhập vào vượt quá số lượng còn lại!</span> <br>
                         <button type="button" class="btn btn-danger mt-2 remove-product-btn">Xóa</button>
                     </div>
                 `;
                 $('#product-select-wrapper').append(newProductSelect);
 
-                // Gắn sự kiện xóa cho nút "Xóa"
+                // Gắn sự kiện xóa cho nút "Xóa" của sản phẩm mới thêm
                 $('.remove-product-btn').off('click').on('click', function() {
                     $(this).closest('.product-item').remove(); // Xóa phần product-item chứa nút "Xóa" được bấm
                 });
             });
 
-            // Thêm tất cả sản phẩm từ modal phụ vào modal chính khi nhấn "Thêm vào hóa đơn"
-            $('#addProductsToList').on('click', function() {
-                $('#product-error').addClass('d-none');
-                // Lấy số ngày thuê từ modal chính
-                const soNgayThue = $('#so_ngay_thue').val();
-
-                if (soNgayThue == '' || soNgayThue <= 0) {
-                    alert("Vui lòng nhập số ngày thuê hợp lệ.");
-                    return;
-                }
-
-                // Lặp qua từng sản phẩm trong modal phụ
-                $('.product-item').each(function() {
-                    const productId = $(this).find('.product-select').val();
-                    const productText = $(this).find('.product-select option:selected').text();
-                    const pricePerDay = $(this).find('.product-select option:selected').data('price');
-                    const quantity = $(this).find('.quantity-input').val();
-
-                    if (productId && quantity > 0) {
-                        const productWrapper = $('#product-wrapper');
-
-                        // Kiểm tra nếu sản phẩm đã tồn tại dựa trên value của input hidden
-                        const existingProduct = productWrapper.find(`input[name^="products"][name$="[id_product]"][value="${productId}"]`);
-
-                        if (existingProduct.length < 1) {
-                            // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào danh sách
-                            const thanhTien = quantity * pricePerDay * soNgayThue; 
-                            totalAmount += thanhTien; 
-
-                            const newProduct = `
-                                <div class='form-group mb-3 text-danger fw-bold product-item position-relative' data-price=${pricePerDay} data-product-index="${productIndex}">
-                                    <label for='product'>Sản phẩm: ${productText}</label>
-                                    <input type="hidden" name="products[${productIndex}][id_product]" value="${productId}">
-                                    <input type="hidden" name="products[${productIndex}][quantity]" value="${quantity}">
-                                    <input type="hidden" name="products[${productIndex}][thanh_tien]" value="${thanhTien}">
-                                    
-                                    <p>Số lượng: ${quantity} | Thành tiền: ${thanhTien.toLocaleString()} VND</p>
-                                    <button type="button" class="btn btn-danger badge position-absolute top-0 end-0 remove-product" data-product-index="${productIndex}">Xóa</button>
-
-                                </div>
-                            `;
-                            productWrapper.append(newProduct);
-                            productIndex++;
-                        }
-                    }
-                });
-
-                // Xử lý xóa sản phẩm
-                $('.remove-product').on('click', function() {
-                    // Lấy thông tin của sản phẩm cần xóa
-                    const productIndex = $(this).data('product-index');
-                    const productItem = $(`.product-item[data-product-index="${productIndex}"]`);
-                    const thanhTien = parseFloat(productItem.find('input[name$="[thanh_tien]"]').val());
-
-                    // Trừ thành tiền của sản phẩm này khỏi tổng thành tiền
-                    totalAmount -= thanhTien;
-
-                    // Đảm bảo totalAmount không âm và đặt về 0 nếu không còn sản phẩm
-                    totalAmount = totalAmount > 0 ? totalAmount : 0;
-
-                    // Cập nhật lại tổng thành tiền hiển thị
-                    $('#thanh_tien').text(Number(totalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                    $('#thanh_tien_input').val(totalAmount.toFixed(2));
-
-                    // Xóa sản phẩm khỏi giao diện
-                    productItem.remove();
-
-                    // Kiểm tra nếu không còn sản phẩm nào, đặt tổng tiền về 0
-                    if ($('#product-wrapper').children().length === 0) {
-                        totalAmount = 0;
-                        $('#thanh_tien').text('0 VND');
-                        $('#thanh_tien_input').val(0);
-                    }
-                });
-
-                // Cập nhật tổng thành tiền
-                totalAmount = totalAmount > 0 ? totalAmount : 0;
-                $('#thanh_tien').text(Number(totalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                $('#thanh_tien_input').val(totalAmount.toFixed(2));
-
-                // Đóng modal sản phẩm
-                $('#addProductModal').modal('hide');
-            });
-            
             // Sự kiện khi nhấn vào nút "Cập nhật lại tiền"
             $('#updateTotalAmount').on('click', function() {
                 const soNgayThue = parseFloat($('#so_ngay_thue').val()); // Lấy số ngày thuê từ input và chuyển sang số
@@ -446,8 +483,8 @@
                         response.products.forEach(function(product, index) {
                             const productHtml = `
                                 <div class='form-group mb-3 text-danger fw-bold edit-product-item position-relative' data-price="${product.price_1_day}" data-product-index="${index}">
-                                    <label for='product'>Sản phẩm: ${product.product_name}</label>
-                                    <input type="hidden" name="products[${index}][id_product]" value="${product.product_id}">
+                                    <label for='product'>Sản phẩm: ${product.product_name} - ${product.title_kho}</label>
+                                    <input type="hidden" name="products[${index}][id_product_theokho]" value="${product.product_id}">
                                     <input type="hidden" name="products[${index}][quantity]" value="${product.quantity}">
                                     <input type="hidden" class="edit-thanh_tien_input" name="products[${index}][thanh_tien]" value="${product.thanh_tien}">
                                     <p>Số lượng: ${product.quantity} | Thành tiền: ${product.thanh_tien} VND</p>
@@ -533,8 +570,10 @@
                     <div class='form-group mb-3 edit-product-item'>
                         <label for='product'>Sản phẩm</label>
                         <select class="form-control product-select">
-                            @foreach($products as $product)
-                                <option value="{{ $product->id }}" data-price="{{ $product->price_1_day }}">{{ $product->product_name }}</option>
+                            @foreach($product_theokhos as $product_theokho)
+                                <option value="{{ $product_theokho->id }}" data-price="{{ $product_theokho->Product->price_1_day }}" data-available-quantity="{{ $product_theokho->available_quantity }}">
+                                    {{ $product_theokho->Product->product_name }} - {{ $product_theokho->title }} (Còn lại: {{ $product_theokho->available_quantity }})
+                                </option>                            
                             @endforeach
                         </select>
                         <input type="number" placeholder="Số lượng" class="form-control quantity-input mt-2" />
@@ -566,85 +605,107 @@
                 $('.edit-product-item').each(function() {
                     productIndex++;
                 });
+                let isValid = true;
 
-                // Lặp qua từng sản phẩm trong modal phụ
                 $('.edit-product-item').each(function() {
-                    const productId = $(this).find('.product-select').val();
-                    const productText = $(this).find('.product-select option:selected').text();
-                    const pricePerDay = $(this).find('.product-select option:selected').data('price');
-                    const quantity = $(this).find('.quantity-input').val();
+                    const quantityInput = $(this).find('.quantity-input'); // Lấy thẻ input số lượng
+                    const quantity = parseInt(quantityInput.val()); // Số lượng nhập vào
+                    const availableQuantity = parseInt($(this).find('.product-select option:selected').data('available-quantity')); // Số lượng còn lại
+                    const errorMessage = $(this).find('.edit-error-message'); // Lấy thẻ thông báo lỗi tương ứng với sản phẩm
 
-                    if (productId && quantity > 0) {
-                        const productWrapper = $('#edit-product-wrapper');
-                        const existingProduct = productWrapper.find(`input[name^="products"][name$="[id_product]"][value="${productId}"]`);
+                    // Kiểm tra nếu số lượng nhập vào lớn hơn số lượng còn lại
+                    if (quantity > availableQuantity || isNaN(quantity)) {
+                        errorMessage.removeClass('d-none'); // Hiển thị thông báo lỗi dưới input
+                        isValid = false; // Đánh dấu không hợp lệ
+                    } else {
+                        errorMessage.addClass('d-none'); // Ẩn thông báo lỗi nếu hợp lệ
+                    }
+                });
 
-                        if (existingProduct.length < 1) {
-                            const thanhTienInput = quantity * pricePerDay * soNgayThue;
+                // Nếu có lỗi, ngăn chặn việc tiếp tục
+                if (!isValid) {
+                    alert('Vui lòng kiểm tra lại số lượng các sản phẩm.');
+                    return false;
+                }else{
+                    // Lặp qua từng sản phẩm trong modal phụ
+                    $('.edit-product-item').each(function() {
+                        const productId = $(this).find('.product-select').val();
+                        const productText = $(this).find('.product-select option:selected').text();
+                        const pricePerDay = $(this).find('.product-select option:selected').data('price');
+                        const quantity = $(this).find('.quantity-input').val();
 
-                            const newProduct = `
-                                <div class='form-group mb-3 text-danger fw-bold edit-product-item position-relative' data-price=${pricePerDay} data-product-index="${productIndex}">
-                                    <label for='product'>Sản phẩm: ${productText}</label>
-                                    <input type="hidden" name="products[${productIndex}][id_product]" value="${productId}">
-                                    <input type="hidden" name="products[${productIndex}][quantity]" value="${quantity}">
-                                    <input type="hidden" class="edit-thanh_tien_input" name="products[${productIndex}][thanh_tien]" value="${thanhTienInput}">
-                                    <p>Số lượng: ${quantity} | Thành tiền: ${thanhTienInput.toLocaleString()} VND</p>
-                                    <button type="button" class="btn btn-danger badge position-absolute top-0 end-0 edit-remove-product" data-product-index="${productIndex}">Xóa</button>
-                                </div>
-                            `;
-                            productWrapper.append(newProduct);
-                            productIndex++;
+                        if (productId && quantity > 0) {
+                            const productWrapper = $('#edit-product-wrapper');
+                            const existingProduct = productWrapper.find(`input[name^="products"][name$="[id_product_theokho]"][value="${productId}"]`);
+
+                            if (existingProduct.length < 1) {
+                                const thanhTienInput = quantity * pricePerDay * soNgayThue;
+
+                                const newProduct = `
+                                    <div class='form-group mb-3 text-danger fw-bold edit-product-item position-relative' data-price=${pricePerDay} data-product-index="${productIndex}">
+                                        <label for='product'>Sản phẩm: ${productText}</label>
+                                        <input type="hidden" name="products[${productIndex}][id_product_theokho]" value="${productId}">
+                                        <input type="hidden" name="products[${productIndex}][quantity]" value="${quantity}">
+                                        <input type="hidden" class="edit-thanh_tien_input" name="products[${productIndex}][thanh_tien]" value="${thanhTienInput}">
+                                        <p>Số lượng: ${quantity} | Thành tiền: ${thanhTienInput.toLocaleString()} VND</p>
+                                        <button type="button" class="btn btn-danger badge position-absolute top-0 end-0 edit-remove-product" data-product-index="${productIndex}">Xóa</button>
+                                    </div>
+                                `;
+                                productWrapper.append(newProduct);
+                                productIndex++;
+                            }
                         }
-                    }
-                });
+                    });
 
-                $('.editProductModal').modal('hide');
-                editTotalAmount = 0;
+                    $('.editProductModal').modal('hide');
+                    editTotalAmount = 0;
 
-                // Tính lại tổng tiền cho tất cả sản phẩm trong danh sách
-                $('#edit-product-wrapper .edit-product-item').each(function() {
-                    let thanhTienInput = parseFloat($(this).find('.edit-thanh_tien_input').val());
+                    // Tính lại tổng tiền cho tất cả sản phẩm trong danh sách
+                    $('#edit-product-wrapper .edit-product-item').each(function() {
+                        let thanhTienInput = parseFloat($(this).find('.edit-thanh_tien_input').val());
 
-                    // Kiểm tra nếu thanhTienInput không hợp lệ (NaN), đặt về 0
-                    if (isNaN(thanhTienInput)) {
-                        thanhTienInput = 0;
-                    }
+                        // Kiểm tra nếu thanhTienInput không hợp lệ (NaN), đặt về 0
+                        if (isNaN(thanhTienInput)) {
+                            thanhTienInput = 0;
+                        }
 
-                    editTotalAmount += thanhTienInput;
-                });
+                        editTotalAmount += thanhTienInput;
+                    });
 
-                // Cập nhật tổng tiền sau khi thêm mới
-                $('#edit-thanh_tien_text').text(Number(editTotalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                $('#edit-thanh_tien').val(editTotalAmount.toFixed(2));
-
-                // Xử lý xóa sản phẩm sau khi thêm mới
-                $('.edit-remove-product').on('click', function() {
-                    // Lấy thông tin của sản phẩm cần xóa
-                    const productIndex = $(this).data('product-index');
-                    const productItem = $(`.edit-product-item[data-product-index="${productIndex}"]`);
-                    let thanhTienInput = parseFloat(productItem.find('.edit-thanh_tien_input').val());
-
-                    // Kiểm tra nếu thanhTienInput không hợp lệ (NaN), đặt về 0
-                    if (isNaN(thanhTienInput)) {
-                        thanhTienInput = 0;
-                    }
-
-                    // Trừ thành tiền của sản phẩm này khỏi tổng thành tiền
-                    editTotalAmount -= thanhTienInput;
-
-                    // Đảm bảo rằng totalAmount không bị âm hoặc NaN
-                    editTotalAmount = editTotalAmount > 0 ? editTotalAmount : 0;
-
-                    // Cập nhật lại tổng thành tiền hiển thị
+                    // Cập nhật tổng tiền sau khi thêm mới
                     $('#edit-thanh_tien_text').text(Number(editTotalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
                     $('#edit-thanh_tien').val(editTotalAmount.toFixed(2));
 
-                    // Xóa sản phẩm khỏi giao diện
-                    productItem.remove();
-                });
+                    // Xử lý xóa sản phẩm sau khi thêm mới
+                    $('.edit-remove-product').on('click', function() {
+                        // Lấy thông tin của sản phẩm cần xóa
+                        const productIndex = $(this).data('product-index');
+                        const productItem = $(`.edit-product-item[data-product-index="${productIndex}"]`);
+                        let thanhTienInput = parseFloat(productItem.find('.edit-thanh_tien_input').val());
 
-                // Cập nhật tổng thành tiền
-                $('#edit-thanh_tien_text').text(Number(editTotalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                $('#edit-thanh_tien').val(editTotalAmount.toFixed(2));
+                        // Kiểm tra nếu thanhTienInput không hợp lệ (NaN), đặt về 0
+                        if (isNaN(thanhTienInput)) {
+                            thanhTienInput = 0;
+                        }
+
+                        // Trừ thành tiền của sản phẩm này khỏi tổng thành tiền
+                        editTotalAmount -= thanhTienInput;
+
+                        // Đảm bảo rằng totalAmount không bị âm hoặc NaN
+                        editTotalAmount = editTotalAmount > 0 ? editTotalAmount : 0;
+
+                        // Cập nhật lại tổng thành tiền hiển thị
+                        $('#edit-thanh_tien_text').text(Number(editTotalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                        $('#edit-thanh_tien').val(editTotalAmount.toFixed(2));
+
+                        // Xóa sản phẩm khỏi giao diện
+                        productItem.remove();
+                    });
+
+                    // Cập nhật tổng thành tiền
+                    $('#edit-thanh_tien_text').text(Number(editTotalAmount.toFixed(2)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                    $('#edit-thanh_tien').val(editTotalAmount.toFixed(2));
+                }
             });
 
             // Sự kiện khi nhấn vào nút "Cập nhật lại tiền"

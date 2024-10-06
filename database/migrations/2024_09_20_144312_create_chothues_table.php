@@ -23,12 +23,13 @@ return new class extends Migration
             $table->decimal('khach_coc', 10, 2)->nullable();
             $table->bigInteger('id_nhanvien')->unsigned()->nullable();
             $table->boolean('Xoa')->nullable();
+            $table->boolean('trangthai')->nullable();
             $table->timestamps();
 
             // Foreign keys
             $table->foreign('id_product')->references('id')->on('products')->onDelete('set null');
             $table->foreign('id_nhanvien')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('id_customer')->references('id')->on('customers')->onDelete('set null');  // Assuming you have a 'khach_hangs' table
+            $table->foreign('id_customer')->references('id')->on('customers')->onDelete('set null'); 
             $table->foreign('id_kho')->references('id')->on('khos')->onDelete('set null');
 
         });
