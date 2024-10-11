@@ -3,6 +3,44 @@
 
     <div class="container-fluid flex-grow-1 container-p-y">
         <h3 class="fw-bold text-primary py-3 mb-4">{{$title}}</h3>
+        <div>
+            <form class="form-search" method="GET" action="{{ route('products.index') }}">
+                @csrf
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="ten-game me-3 mb-0">Tìm kiếm</h4>
+                </div>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="number" name="search_id" placeholder="Tìm theo mã số..." value="{{ request('search_id') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_name" placeholder="Tìm theo tên sản phẩm..." value="{{ request('search_name') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_size" placeholder="Tìm theo kích thước..." value="{{ request('search_size') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <select class="form-control shadow-none" name="search_category">
+                                <option value="">Chọn danh mục</option>
+                                @foreach($cates as $cate)
+                                    <option value="{{ $cate->id }}" {{ request('search_category') == $cate->id ? 'selected' : '' }}>
+                                        {{ $cate->cate_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <div class="text-nowrap">
+                                <button type="submit" class="btn btn-danger rounded-pill"><i class="fas fa-search me-2"></i>Tìm kiếm</button>
+                                <a href="{{ route('products.index') }}" class="btn btn-secondary rounded-pill ms-2"><i class="fas fa-times me-2"></i>Xóa lọc</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
         <div class="card">
             <div class="d-flex p-4 justify-content-between">
                 <h5 class=" fw-bold">Danh sách sản phẩm</h5>
@@ -121,50 +159,52 @@
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5 text-danger" id="createProductLabel"> </h1>
                             </div>
-                            <div class="card-body">
-                                <form method='post' action='' enctype="multipart/form-data" class="editProductForm form-edit" id="form_productAdmin_update">
-                                    @method('PATCH')
-                                    @csrf
-                                    <div class="mb-3 d-flex flex-column image-gallery" id="image-gallery-{{$product->id}}">
-                                        <label
-                                            class='form-label'
-                                            for='basic-default-fullname'
-                                        >Ảnh</label>
-                                        <input type="file" name="image" class="file-input" id="file-input-{{$product->id}}" multiple onchange="previewImages(event, {{$product->id}})">
-                                        <div class="image-preview" id="image-preview-{{$product->id}}"></div>
-                                    </div>
-                                    <div class='mb-3'>
-                                        <label class='form-label' for='product_name_edit'>Tên sản phẩm</label>
-                                        <input type='text' class='form-control input-field' id='product_name_edit' data-require='Mời nhập Tên sản phẩm' name='product_name' placeholder='Nhập tên sản phẩm' />
-                                    </div>
-                                    <div class='mb-3'>
-                                        <label class='form-label' for='size_edit'>Size</label>
-                                        <input type='text' class='form-control' id='size_edit' name='size' placeholder='Nhập size' />
-                                    </div>
-                                    <div class='mb-3'>
-                                        <label class='form-label' for='price_1_day_edit'>Giá / Ngày</label>
-                                        <input type='number' class='form-control input-field' id='price_1_day_edit' name='price_1_day' placeholder='Nhập giá / ngày' />
-                                    </div>
-                                    <div class='mb-3'>
-                                        <label class='form-label' for='quantity_origin_edit'>Số lượng ban đầu</label>
-                                        <input type='number' class='form-control' id='quantity_origin_edit' name='quantity_origin' placeholder='Nhập số lượng ban đầu' />
-                                    </div>
-                                    <div class='mb-3'>
-                                        <label class='form-label' for='cate_id_edit'>Danh mục</label>
-                                        <select name="cate_id" class="form-control" id="cate_id_edit">
-                                            <option value="">Chọn danh mục</option>
-                                            @foreach($cates as $cate)
-                                                <option value="{{ $cate->id }}">{{ $cate->cate_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-success fw-semibold text-dark">Cập nhật</button>
-                                        <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </form>
-                                
-                            </div>
+                            @if($products->count() > 0)
+                                <div class="card-body">
+                                    <form method='post' action='' enctype="multipart/form-data" class="editProductForm form-edit" id="form_productAdmin_update">
+                                        @method('PATCH')
+                                        @csrf
+                                        <div class="mb-3 d-flex flex-column image-gallery" id="image-gallery-{{$product->id}}">
+                                            <label
+                                                class='form-label'
+                                                for='basic-default-fullname'
+                                            >Ảnh</label>
+                                            <input type="file" name="image" class="file-input" id="file-input-{{$product->id}}" multiple onchange="previewImages(event, {{$product->id}})">
+                                            <div class="image-preview" id="image-preview-{{$product->id}}"></div>
+                                        </div>
+                                        <div class='mb-3'>
+                                            <label class='form-label' for='product_name_edit'>Tên sản phẩm</label>
+                                            <input type='text' class='form-control input-field' id='product_name_edit' data-require='Mời nhập Tên sản phẩm' name='product_name' placeholder='Nhập tên sản phẩm' />
+                                        </div>
+                                        <div class='mb-3'>
+                                            <label class='form-label' for='size_edit'>Size</label>
+                                            <input type='text' class='form-control' id='size_edit' name='size' placeholder='Nhập size' />
+                                        </div>
+                                        <div class='mb-3'>
+                                            <label class='form-label' for='price_1_day_edit'>Giá / Ngày</label>
+                                            <input type='number' class='form-control input-field' id='price_1_day_edit' name='price_1_day' placeholder='Nhập giá / ngày' />
+                                        </div>
+                                        <div class='mb-3'>
+                                            <label class='form-label' for='quantity_origin_edit'>Số lượng ban đầu</label>
+                                            <input type='number' class='form-control' id='quantity_origin_edit' name='quantity_origin' placeholder='Nhập số lượng ban đầu' />
+                                        </div>
+                                        <div class='mb-3'>
+                                            <label class='form-label' for='cate_id_edit'>Danh mục</label>
+                                            <select name="cate_id" class="form-control" id="cate_id_edit">
+                                                <option value="">Chọn danh mục</option>
+                                                @foreach($cates as $cate)
+                                                    <option value="{{ $cate->id }}">{{ $cate->cate_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success fw-semibold text-dark">Cập nhật</button>
+                                            <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </form>
+                                    
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

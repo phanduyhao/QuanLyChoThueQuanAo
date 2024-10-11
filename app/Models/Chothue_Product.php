@@ -14,4 +14,8 @@ class Chothue_Product extends Model
     {
         return $this->belongsTo( Product::class, 'id_product','id');
     }
+    public function Chothue()
+    {
+        return $this->belongsTo( Chothue::class, 'id_chothue','id');
+    }
 }

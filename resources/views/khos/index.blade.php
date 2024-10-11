@@ -3,6 +3,52 @@
 
     <div class="container-fluid flex-grow-1 container-p-y">
         <h3 class="fw-bold text-primary py-3 mb-4">{{$title}}</h3>
+        <div>
+            <form class="form-search" method="GET" action="{{ route('khos.index') }}">
+                @csrf
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="ten-game me-3 mb-0">Tìm kiếm</h4>
+                </div>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" 
+                                   type="text" 
+                                   id="searchInputNv" 
+                                   name="search_id" 
+                                   placeholder="Tìm theo mã số..." 
+                                   value="{{ request()->search_id }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" 
+                                   type="text" 
+                                   id="searchInputVk" 
+                                   name="search_kho_name" 
+                                   placeholder="Tìm theo tên kho..." 
+                                   value="{{ request()->search_kho_name }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" 
+                                   type="text" 
+                                   id="searchInputVk" 
+                                   name="search_product_name" 
+                                   placeholder="Tìm theo tên sản phẩm..." 
+                                   value="{{ request()->search_product_name }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <div class="text-center text-nowrap">
+                                <button type="submit" class="btn btn-danger rounded-pill">
+                                    <i class="fas fa-search me-2"></i>Tìm kiếm
+                                </button>
+                                <a href="{{ route('khos.index') }}" class="btn btn-secondary rounded-pill ms-2">
+                                    <i class="fas fa-times me-2"></i>Xóa lọc
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="card">
             <div class="d-flex p-4 justify-content-between">
                 <h5 class=" fw-bold">Danh sách kho</h5>
@@ -40,7 +86,7 @@
                                         <option value="">Chọn sản phẩm</option>
                                         @foreach($products as $product)
                                             <option value="{{ $product->id }}">
-                                                {{ $product->product_name }} - Còn lại: {{ $product->available_quantity }}
+                                                {{ $product->product_name }} ( {{ $product->size }} ) : {{ $product->available_quantity }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -104,7 +150,7 @@
                             <td> {{ $loop->iteration }}</td>
                             <td>{{$kho->id}}</td>
                             <td>{{$kho->title}}</td>
-                            <td>{{$kho->Product->product_name??"Chưa có sản phẩm"}}</td>
+                            <td>{{$kho->Product->product_name??"Chưa có sản phẩm"}} - {{$kho->Product->size}}</td>
                             <td>{{ $kho->total_quantity }}</td> <!-- Tổng số lượng -->
                             <td>{{ $kho->quantity_available }}</td> <!-- Số lượng rảnh -->
                             <td>{{ $kho->quantity_rented }}</td> <!-- Số lượng đang cho thuê -->                            <td>{{$kho->desc}}</td>
@@ -164,7 +210,7 @@
                                         <select name="id_product" class="form-control input-field" id="product-edit" data-require="Mời chọn sản phẩm">
                                             <option value="">Chọn sản phẩm</option>
                                             @foreach($products as $product)
-                                                <option value="{{ $product->id }}">{{ $product->product_name }} - Còn lại: {{ $product->available_quantity }}</option>
+                                                <option value="{{ $product->id }}"> {{ $product->product_name }} ( {{ $product->size }} ) : {{ $product->available_quantity }}</option>
                                             @endforeach
                                         </select>
                                     </div>

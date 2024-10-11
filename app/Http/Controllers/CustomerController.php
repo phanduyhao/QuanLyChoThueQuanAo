@@ -14,13 +14,33 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $perPage = 10; // Số bản ghi trên mỗi trang
-
-        // Sử dụng phương thức paginate để lấy dữ liệu phân trang
-        $customers = Customer::where('Xoa', null)->paginate($perPage);
-        return view('customers.index',compact('customers', ),[
+        $query = Customer::where('Xoa', null);
+    
+        // Tìm kiếm theo ID
+        if ($request->input('search_id')) {
+            $query->where('id', $request->input('search_id'));
+        }
+    
+        // Tìm kiếm theo tên
+        if ($request->input('search_name')) {
+            $query->where('name', 'LIKE', '%' . $request->input('search_name') . '%');
+        }
+    
+        // Tìm kiếm theo email
+        if ($request->input('search_email')) {
+            $query->where('email', 'LIKE', '%' . $request->input('search_email') . '%');
+        }
+    
+        // Tìm kiếm theo số điện thoại
+        if ($request->input('search_phone')) {
+            $query->where('phone_number', 'LIKE', '%' . $request->input('search_phone') . '%');
+        }
+    
+        $customers = $query->paginate(20);
+    
+        return view('customers.index', compact('customers'), [
             'title' => 'Tài khoản khách hàng'
         ]);
     }

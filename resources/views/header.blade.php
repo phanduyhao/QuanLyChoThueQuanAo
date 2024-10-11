@@ -9,18 +9,18 @@
 />
 
 <!-- Icons. Uncomment required icon fonts -->
-<link rel="stylesheet" href="/temp/assets/vendor/fonts/boxicons.css" />
+<link rel="stylesheet" href="/temp/vendor/fonts/boxicons.css" />
 <link rel="stylesheet" href="/temp/bootstrap/css/bootstrap.min.css">
 
 <!-- Core CSS -->
-<link rel="stylesheet" href="/temp/assets/vendor/css/core.css" class="template-customizer-core-css" />
-<link rel="stylesheet" href="/temp/assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
-<link rel="stylesheet" href="/temp/assets/css/demo.css" />
+<link rel="stylesheet" href="/temp/vendor/css/core.css" class="template-customizer-core-css" />
+<link rel="stylesheet" href="/temp/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+<link rel="stylesheet" href="/temp/css/demo.css" />
 
 <!-- Vendors CSS -->
-<link rel="stylesheet" href="/temp/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+<link rel="stylesheet" href="/temp/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
 
-<link rel="stylesheet" href="/temp/assets/vendor/libs/apex-charts/apex-charts.css" />
+<link rel="stylesheet" href="/temp/vendor/libs/apex-charts/apex-charts.css" />
 <link rel="stylesheet" href="/temp/viewer/dist/viewer.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
@@ -28,12 +28,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <!-- Helpers -->
-<script src="/temp/assets/vendor/js/helpers.js"></script>
+<script src="/temp/vendor/js/helpers.js"></script>
 <script src="/temp/libs/jquery/dist/jquery.min.js"></script>
-<script src="/temp/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/temp/js/bootstrap.bundle.min.js"></script>
 <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
 <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-<script src="/temp/assets/js/config.js"></script>
+<script src="/temp/js/config.js"></script>
 <script src="/ckeditor/ckeditor.js"></script>
 
 

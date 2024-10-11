@@ -3,6 +3,40 @@
 
     <div class="container-fluid flex-grow-1 container-p-y">
         <h3 class="fw-bold text-primary py-3 mb-4">{{$title}}</h3>
+        <div>
+            <form class="form-search" method="GET" action="{{ route('chothues.index') }}">
+                @csrf
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="ten-game me-3 mb-0">Tìm kiếm</h4>
+                </div>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="number" name="search_id" placeholder="Tìm theo mã số..." value="{{ request('search_id') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_customer" placeholder="Tìm theo tên khách hàng ( sđt )..." value="{{ request('search_customer') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_employee" placeholder="Tìm theo nhân viên.." value="{{ request('search_employee') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <select name="search_status" class="form-control">
+                                <option value="">Chọn trạng thái</option>
+                                <option value="1" {{ request('search_status') == '1' ? 'selected' : '' }}>Đang cho thuê</option>
+                                <option value="0" {{ request('search_status') == '0' ? 'selected' : '' }}>Đã trả</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <div class="text-nowrap">
+                                <button type="submit" class="btn btn-danger rounded-pill"><i class="fas fa-search me-2"></i>Tìm kiếm</button>
+                                <a href="{{ route('chothues.index') }}" class="btn btn-secondary rounded-pill ms-2"><i class="fas fa-times me-2"></i>Xóa lọc</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="card">
             <div class="d-flex p-4 justify-content-between">
                 <h5 class=" fw-bold">Danh sách thông tin cho thuê sản phẩm</h5>
@@ -107,10 +141,10 @@
                         <th>STT</th>
                         <th>ID </th>
                         <th>Khách hàng</th>
-                        <th>Sản phẩm</th>
                         <th>Số ngày thuê</th>
                         <th>Thành tiền</th>
                         <th>Khách cọc</th>
+                        <th>Trạng thái</th>
                         <th>Nhân viên</th>
                         <th>Thời gian</th>
                         <th>Thao tác</th>
@@ -122,10 +156,16 @@
                             <td> {{ $loop->iteration }}</td>
                             <td>{{$chothue->id}}</td>
                             <td>{{$chothue->Customer->name}} - {{$chothue->Customer->phone_number}}</td>
-                            <td>{{$chothue->Product->product_name??"Chưa có sản phẩm"}}</td>
                             <td>{{$chothue->so_ngay_thue}}</td>
                             <td>{{$chothue->thanh_tien}}</td>
                             <td>{{$chothue->khach_coc}}</td>
+                            <td>
+                                @if($chothue->trangthai == 1)
+                                    <span class="text-warning fw-bold">Đang cho thuê</span>
+                                @else
+                                    <span class="text-success fw-bold">Đã trả</span>
+                                @endif
+                            </td>
                             <td>{{$chothue->Nhanvien->name}}</td>
                             <td>{{$chothue->updated_at}}</td>
                             <td class="">
@@ -194,6 +234,22 @@
                                         <label class='form-label' for='edit-khach_coc'>Khách cọc</label>
                                         <input type='number' step="0.01" class='form-control input-field' id='edit-khach_coc' placeholder='Nhập số tiền khách cọc' name='khach_coc' />
                                     </div>
+                                    <div class='mb-3'>
+                                        <label class='form-label' for='edit-status'>Trạng thái</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="trangthai" id="trangthai1" value="0">
+                                            <label class="form-check-label" for="trangthai1">
+                                                Đã trả
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="trangthai" id="trangthai2" value="1">
+                                            <label class="form-check-label" for="trangthai3">
+                                                Đang cho thuê
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="modal-footer">
                                         <button type='submit' class='btn btn-success fw-semibold text-dark'>Cập nhật</button>
                                         <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Đóng</button>
@@ -469,6 +525,13 @@
                         $('#'+IdEditChothue + ' #edit-phone_number').val(response.customer.phone_number);
                         $('#'+IdEditChothue + ' #edit-so_ngay_thue').val(response.so_ngay_thue);
                         $('#'+IdEditChothue + ' #edit-thanh_tien').val(response.thanh_tien);
+                        if(response.trangthai == 1){
+                            $('#'+IdEditChothue + ' #trangthai2').prop('checked', true); // Đánh dấu radio "Đang cho thuê"
+                        }else{
+                            $('#'+IdEditChothue + ' #trangthai1').prop('checked', true); // Đánh dấu radio "Đã trả"
+                        }
+
+
                         const thanhTienInput = parseFloat(response.thanh_tien);
                         if (!isNaN(thanhTienInput)) {
                             $('#'+IdEditChothue + ' #edit-thanh_tien_text').text(thanhTienInput.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));

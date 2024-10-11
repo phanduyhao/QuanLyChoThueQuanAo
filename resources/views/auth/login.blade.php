@@ -1,4 +1,4 @@
-<html lang="en" class="light-style customizer-hide" dir="ltr" data-theme="theme-default" data-assets-path="/temp/assets/" data-template="vertical-menu-template-free"><head>
+<html lang="en" class="light-style customizer-hide" dir="ltr" data-theme="theme-default" data-assets-path="/temp/" data-template="vertical-menu-template-free"><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -7,7 +7,7 @@
     <meta name="description" content="">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/temp/assets/img/favicon/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/temp/img/favicon/favicon.ico">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,21 +15,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet">
 
     <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" href="/temp/assets/vendor/fonts/boxicons.css">
+    <link rel="stylesheet" href="/temp/vendor/fonts/boxicons.css">
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="/temp/assets/vendor/css/core.css" class="template-customizer-core-css">
-    <link rel="stylesheet" href="/temp/assets/vendor/css/theme-default.css" class="template-customizer-theme-css">
-    <link rel="stylesheet" href="/temp/assets/css/demo.css">
+    <link rel="stylesheet" href="/temp/vendor/css/core.css" class="template-customizer-core-css">
+    <link rel="stylesheet" href="/temp/vendor/css/theme-default.css" class="template-customizer-theme-css">
+    <link rel="stylesheet" href="/temp/css/demo.css">
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="/temp/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="/temp/vendor/libs/perfect-scrollbar/perfect-scrollbar.css">
 
     <!-- Page CSS -->
     <!-- Page -->
-    <link rel="stylesheet" href="/temp/assets/vendor/css/pages/page-auth.css">
+    <link rel="stylesheet" href="/temp/vendor/css/pages/page-auth.css">
     <!-- Helpers -->
-    <script src="/temp/assets/vendor/js/helpers.js"></script><style type="text/css">
+    <script src="/temp/vendor/js/helpers.js"></script><style type="text/css">
 .layout-menu-fixed .layout-navbar-full .layout-menu,
 .layout-page {
   padding-top: 0px !important;
@@ -40,7 +40,7 @@
 
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="/temp/assets/js/config.js"></script>
+    <script src="/temp/js/config.js"></script>
   </head>
 
   <body>
@@ -151,18 +151,18 @@
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
-    <script src="/temp/assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="/temp/assets/vendor/libs/popper/popper.js"></script>
-    <script src="/temp/assets/vendor/js/bootstrap.js"></script>
-    <script src="/temp/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="/temp/vendor/libs/jquery/jquery.js"></script>
+    <script src="/temp/vendor/libs/popper/popper.js"></script>
+    <script src="/temp/vendor/js/bootstrap.js"></script>
+    <script src="/temp/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
 
-    <script src="/temp/assets/vendor/js/menu.js"></script>
+    <script src="/temp/vendor/js/menu.js"></script>
     <!-- endbuild -->
 
     <!-- Vendors JS -->
 
     <!-- Main JS -->
-    <script src="/temp/assets/js/main.js"></script>
+    <script src="/temp/js/main.js"></script>
 
     <!-- Page JS -->
 

@@ -3,6 +3,36 @@
 
     <div class="container-fluid flex-grow-1 container-p-y">
         <h3 class="fw-bold text-primary py-3 mb-4">{{$title}}</h3>
+        <div>
+            <form class="form-search" method="GET" action="{{ route('customers.index') }}">
+                @csrf
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="ten-game me-3 mb-0">Tìm kiếm</h4>
+                </div>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="number" name="search_id" placeholder="Tìm theo mã số..." value="{{ request('search_id') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_name" placeholder="Tìm theo tên..." value="{{ request('search_name') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_email" placeholder="Tìm theo email..." value="{{ request('search_email') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_phone" placeholder="Tìm theo số điện thoại..." value="{{ request('search_phone') }}">
+                        </div>
+                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                            <div class="text-nowrap">
+                                <button type="submit" class="btn btn-danger rounded-pill"><i class="fas fa-search me-2"></i>Tìm kiếm</button>
+                                <a href="{{ route('customers.index') }}" class="btn btn-secondary rounded-pill ms-2"><i class="fas fa-times me-2"></i>Xóa lọc</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="card">
             <div class="d-flex p-4 justify-content-between">
                 <h5 class=" fw-bold">Tài khoản khách hàng </h5>

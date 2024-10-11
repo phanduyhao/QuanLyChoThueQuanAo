@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kho;
-use App\Models\Chothue_Product;
+use App\Models\Chothue;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,9 +16,16 @@ class KhoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $perPage = 10;
+        $perPage = 20;
+
+        // Lấy các tham số tìm kiếm từ request
+        $searchId = $request->input('search_id');
+        $searchKhoName = $request->input('search_kho_name');
+        $searchProductName = $request->input('search_product_name');
+
+        // Lọc sản phẩm dựa trên tên sản phẩm nếu có yêu cầu tìm kiếm
         $products = Product::where('Xoa', null)->get()->map(function ($product) {
             // Tính tổng số lượng đã nhập cho sản phẩm này
             $totalInStock = Kho::where('Xoa', null)
@@ -33,23 +40,34 @@ class KhoController extends Controller
     
             return $product;
         });
+
+        $khos = Kho::where('Xoa', null)
+        ->when($searchId, function ($query, $searchId) {
+            return $query->where('id', $searchId);
+        })
+        ->when($searchKhoName, function ($query, $searchKhoName) {
+            return $query->where('title', 'like', '%' . $searchKhoName . '%');
+        })
+        ->when($searchProductName, function ($query, $searchProductName) {
+            // Sử dụng whereHas để tìm kiếm theo tên sản phẩm liên kết với kho
+            return $query->whereHas('product', function ($query) use ($searchProductName) {
+                $query->where('product_name', 'like', '%' . $searchProductName . '%');
+            });
+        })
+        ->paginate($perPage);
     
-        $khos = Kho::where('Xoa', null)->paginate($perPage);
         // Tính số lượng rảnh và số lượng đang cho thuê cho từng kho
         foreach ($khos as $kho) {
-            // Tổng số lượng trong kho
             $kho->total_quantity = $kho->quantity;
-
-            // Số lượng đang cho thuê từ bảng Chothue_Product
-            $kho->quantity_rented = Chothue_Product::where('id_product_theokho', $kho->id)->sum('quantity');
-
-            // Số lượng rảnh là tổng số lượng trừ đi số lượng đang cho thuê
+            $kho->quantity_rented = ChoThue::where('Xoa', null)->where('id_kho', $kho->id)->sum('quantity');
             $kho->quantity_available = $kho->total_quantity - $kho->quantity_rented;
         }
+
         return view('khos.index', compact('khos', 'products'), [
             'title' => 'Quản lý kho'
         ]);
     }
+
     
 
     /**

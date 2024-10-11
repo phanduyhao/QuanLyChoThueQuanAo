@@ -14,16 +14,30 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $perPage = 10; // Số bản ghi trên mỗi trang
-
-        // Sử dụng phương thức paginate để lấy dữ liệu phân trang
-        $categories = Category::where('Xoa', null)->paginate($perPage);
-        return view('categories.index',compact('categories', ),[
+        $perPage = 20; // Số bản ghi trên mỗi trang
+    
+        // Tạo query cơ bản để lấy các danh mục chưa bị xóa
+        $query = Category::where('Xoa', null);
+    
+        // Kiểm tra điều kiện tìm kiếm
+        if ($request->has('search_id') && $request->search_id) {
+            $query->where('id', $request->search_id);
+        }
+        if ($request->has('search_name') && $request->search_name) {
+            $query->where('cate_name', 'LIKE', '%' . $request->search_name . '%');
+        }
+    
+        // Lấy danh sách các danh mục với phân trang và thêm các tham số tìm kiếm vào liên kết phân trang
+        $categories = $query->paginate($perPage)->appends($request->only('search_id', 'search_name'));
+    
+        return view('categories.index', compact('categories'), [
             'title' => 'Quản lý danh mục'
         ]);
     }
+    
+    
 
     /**
      * Show the form for creating a new resource.

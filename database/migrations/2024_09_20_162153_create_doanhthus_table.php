@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('doanhthus', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_kho')->unsigned()->nullable();
+            $table->unsignedBigInteger('id_chothue')->nullable();
+            $table->foreign('id_chothue')->references('id')->on('chothues')->onDelete('set null');
+            $table->unsignedBigInteger('id_kho')->nullable();
             $table->foreign('id_kho')->references('id')->on('khos')->onDelete('set null');
-            $table->string('doanh_thu')->nullable();;
+            $table->string('doanh_thu_thuc_te')->nullable();
+            $table->string('doanh_thu_du_kien')->nullable();
             $table->timestamps();
         });
     }

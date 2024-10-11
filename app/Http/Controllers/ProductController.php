@@ -10,17 +10,37 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $perPage = 10; // Số bản ghi trên mỗi trang
-        $cates = Category::Where('Xoa',null)->get();   
-        // Sử dụng phương thức paginate để lấy dữ liệu phân trang
-        $products = Product::where('Xoa', null)->paginate($perPage);
-        return view('products.index',compact('products','cates' ),[
+        $perPage = 20; // Số bản ghi trên mỗi trang
+        $cates = Category::where('Xoa', null)->get(); // Lấy danh sách các danh mục
+        
+        // Tạo query cơ bản để lấy các sản phẩm chưa bị xóa
+        $query = Product::where('Xoa', null);
+    
+        // Kiểm tra điều kiện tìm kiếm
+        if ($request->has('search_id') && $request->search_id) {
+            $query->where('id', $request->search_id);
+        }
+        if ($request->has('search_name') && $request->search_name) {
+            $query->where('product_name', 'LIKE', '%' . $request->search_name . '%');
+        }
+        if ($request->has('search_size') && $request->search_size) {
+            $query->where('size', 'LIKE', '%' . $request->search_size . '%');
+        }
+        if ($request->input('search_category')) {
+            // Đổi 'category_id' thành tên cột chính xác trong bảng 'products', ví dụ 'cate_id'
+            $query->where('cate_id', $request->input('search_category'));
+        }
+    
+        // Lấy danh sách sản phẩm với phân trang và thêm các tham số tìm kiếm vào liên kết phân trang
+        $products = $query->paginate($perPage)->appends($request->only('search_id', 'search_name', 'search_size', 'search_category'));
+    
+        return view('products.index', compact('products', 'cates'), [
             'title' => 'Quản lý sản phẩm'
         ]);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */

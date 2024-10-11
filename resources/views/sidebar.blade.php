@@ -45,9 +45,9 @@
             </ul>
 
         <li class='menu-item'>
-            <a href='javascript:void(0);' class='menu-link menu-toggle'>
+            <a href='{{route("users.index")}}' class='menu-link '>
                 <i class='menu-icon tf-icons bx bxs-user-account'></i>
-                <div data-i18n='Layouts'>Quản lý tài khoản</div>
+                <div data-i18n='Layouts'>Tài khoản quản trị</div>
             </a>
             <ul class='menu-sub ms-4'>
                 <li class='menu-item'>
@@ -55,6 +55,14 @@
                         <div data-i18n='Without menu'>Tài khoản quản trị</div>
                     </a>
                 </li>
+            </ul>
+        </li>
+        <li class='menu-item'>
+            <a href='{{route("customers.index")}}' class='menu-link '>
+                <i class='menu-icon tf-icons bx bxs-user-account'></i>
+                <div data-i18n='Layouts'>Tài khoản khách hàng</div>
+            </a>
+            <ul class='menu-sub ms-4'>
                 <li class='menu-item'>
                     <a href='{{route("customers.index")}}' class='menu-link'>
                         <div data-i18n='Without menu'>Tài khoản khách hàng</div>
