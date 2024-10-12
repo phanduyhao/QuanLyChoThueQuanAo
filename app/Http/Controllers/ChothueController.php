@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doanhthu;
 use App\Models\Kho;
 use App\Models\Chothue;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Customer;
+use App\Models\Doanhthu;
 use Illuminate\Http\Request;
 use App\Models\Chothue_Product;
 use Illuminate\Validation\Rule;
@@ -63,8 +64,16 @@ class ChothueController extends Controller
             return $kho;
         });
     
+
+        $tencuahang = Setting::where('setting_code', 'ten_cua_hang')->value('value');
+        $sdt = Setting::where('setting_code', 'sdt')->value('value');
+        $stk = Setting::where('setting_code', 'stk')->value('value');
+        $dia_chi = Setting::where('setting_code', 'dia_chi')->value('value');
+        $link_qr = Setting::where('setting_code', 'link_qr_code')->value('value');
+        $ghi_chu = Setting::where('setting_code', 'ghi_chu')->value('value');
+
         // Trả về view với dữ liệu đã tính toán
-        return view('chothues.index', compact('chothues', 'product_theokhos'), [
+        return view('chothues.index', compact('chothues', 'product_theokhos','tencuahang','sdt','stk','link_qr','ghi_chu','dia_chi'), [
             'title' => 'Cho thuê'
         ]);
     }

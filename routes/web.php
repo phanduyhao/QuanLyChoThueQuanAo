@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -40,5 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/chothue_product/delete/{id}', [ChothueController::class, 'destroyProduct']);
 
     Route::resource('doanhthus', DoanhthuController::class);
+
+    Route::resource('settings', SettingController::class);
+    Route::post('settings/update', [SettingController::class, 'update'])->name('update');
+
     
 });

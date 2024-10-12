@@ -1,6 +1,10 @@
 @extends('main')
 @section('contents')
-
+<style>
+    .text-den{
+        color: black !important;
+    }
+</style>
     <div class="container-fluid flex-grow-1 container-p-y">
         <h3 class="fw-bold text-primary py-3 mb-4">{{$title}}</h3>
         <div>
@@ -155,6 +159,11 @@
                                 <button type="button" data-url="/chothues/{{$chothue->id}}" data-id="{{$chothue->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$chothue->id}}">Xóa</button>
                                 @endif
                                 <button type="button" data-id="{{$chothue->id}}" class="btn btn-edit btnEditChothue btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                <button type="button" data-time="{{$chothue->created_at}}" data-customer="{{$chothue->Customer->name}}" data-sdt="{{$chothue->Customer->phone_number}}" data-product="{{$chothue->Product->product_name}} - {{$chothue->Product->size}}" 
+                                    data-ngaythue="{{$chothue->so_ngay_thue}}" data-id="{{$chothue->id}}"  data-quantity="{{$chothue->quantity}}" data-price="{{$chothue->Product->price_1_day}}" 
+                                    data-thanhtien="{{$chothue->thanh_tien}}" data-khach_coc="{{$chothue->khach_coc}}"
+                                    class="btn btn-xuat btnXuatChothue btn-success  text-dark px-2 py-1 fw-bolder">Xuất HĐ</button>
+
                             </td>
 
                             <!-- Modal Delete -->
@@ -245,6 +254,72 @@
                                         <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Đóng</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                   <!-- Modal Xuất Hóa đơn -->
+                   <div class="modal fade ModelXuatChothue" id="XuatHdChothue" tabindex="-1" aria-labelledby="editChothueLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="max-width:50rem !important;">
+                        <div class="modal-content">
+                            <div class="pt-3 text-center">
+                                <h1 class="text-den fw-bold text-uppercase" id="editChothueLabel">{{$tencuahang}}</h1>
+                            </div>
+                            <div class="card-body">
+                                <div class="header-hoadon border-bottom">
+                                    <h5 class="text-uppercase text-den fw-bold">cho thuê trang phục - phụ kiện chụp ảnh</h5>
+                                    <h5 class="text-den fw-bold">{{$sdt}}</h5>
+                                    <h5 class="text-den fw-bold">{{$stk}}</h5>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <h5 class="text-den fw-bold">{{$dia_chi}}</h5>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <h5 id="thoigianxuathoadon"></h5>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="customer-info mt-3 border-bottom">
+                                    <h5 class="">Khách hàng : <span id="tenkhachhang"></span> </h5>
+                                    <h5 class="">Số điện thoại : <span id="sdtkhachhang"></span> </h5>
+                                </div>
+
+                                <div class="product-info mt-4 border-bottom">
+                                    <div class="table-responsive text-nowrap">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th class="fs-6">Sản phẩm</th>
+                                                <th class="fs-6">Số lượng </th>
+                                                <th class="fs-6">Số ngày thuê </th>
+                                                <th class="fs-6">Đơn giá / ngày thuê</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="table-border-bottom-0 text-den">
+                                                <tr data-id="">
+                                                    <td id="product_xuathd">  </td>
+                                                    <td id="quantity_xuathd">  </td>
+                                                    <td id="ngaythue_xuathd">  </td>
+                                                    <td id="price_xuathd" class="">  </td>
+                                                </tr>
+                                                <tr data-id="">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td class="fw-bold text-den fs-5"> Tổng: </td>
+                                                    <td class="fw-bold text-den fs-5 " id="tongtien">  </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                 
+                                    </div>
+                                    <h5 class="">Đặt cọc : <span id="khachcoc_xuathd"></span> </h5>
+
+                                </div>
+                                <div class="mt-4">
+                                    <h5 class="text-danger fw-bold" style="color:red !important">*Lưu ý:  <p class="mt-3" id="luuy_xuathd">{{$ghi_chu}}</p> </h5>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -444,6 +519,40 @@
                     availableQuantity += oldQuantity;
                     $('#edit-soluongconlai').val(availableQuantity);
                 });
+            });
+
+
+            // XUẤT HÓA ĐƠN
+            
+
+            function formatCurrencyVND(amount) {
+                return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            }
+            $('.btnXuatChothue').on('click', function() {
+                var chothueID = $(this).data('id'); 
+                const tenkhachhang = $(this).data('customer');
+                const sdt = $(this).data('sdt');
+                const product = $(this).data('product');
+                const ngaythue = $(this).data('ngaythue');
+                const quantity = $(this).data('quantity');
+                const price = $(this).data('price');
+                const thanhtien = $(this).data('thanhtien');
+                const khach_coc = $(this).data('khach_coc');
+                const time = $(this).data('time');
+
+                $('#tenkhachhang').text(tenkhachhang);
+                $('#sdtkhachhang').text(sdt);
+                $('#product_xuathd').text(product);
+                $('#quantity_xuathd').text(quantity);
+                $('#ngaythue_xuathd').text(ngaythue);
+
+                // Sử dụng hàm định dạng tiền cho các giá trị tiền tệ
+                $('#price_xuathd').text(formatCurrencyVND(price));
+                $('#tongtien').text(formatCurrencyVND(thanhtien));
+                $('#khachcoc_xuathd').text(formatCurrencyVND(khach_coc));
+                $('#thoigianxuathoadon').text(time);
+
+                $('#XuatHdChothue').modal('show');
             });
         });
 
