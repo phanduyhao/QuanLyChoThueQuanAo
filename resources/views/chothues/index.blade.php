@@ -526,8 +526,9 @@
             
 
             function formatCurrencyVND(amount) {
-                return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
             }
+
             $('.btnXuatChothue').on('click', function() {
                 var chothueID = $(this).data('id'); 
                 const tenkhachhang = $(this).data('customer');
@@ -535,10 +536,14 @@
                 const product = $(this).data('product');
                 const ngaythue = $(this).data('ngaythue');
                 const quantity = $(this).data('quantity');
-                const price = $(this).data('price');
-                const thanhtien = $(this).data('thanhtien');
-                const khach_coc = $(this).data('khach_coc');
+                const price = parseFloat($(this).data('price')) || 0;
+                const thanhtien = parseFloat($(this).data('thanhtien')) || 0;
+                const khach_coc = parseFloat($(this).data('khach_coc')) || 0;
                 const time = $(this).data('time');
+
+                console.log("Price:", price);
+                console.log("Thành tiền:", thanhtien);
+                console.log("Khách cọc:", khach_coc);
 
                 $('#tenkhachhang').text(tenkhachhang);
                 $('#sdtkhachhang').text(sdt);
@@ -555,7 +560,6 @@
                 $('#XuatHdChothue').modal('show');
             });
         });
-
     </script>
 @endsection
 
