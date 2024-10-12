@@ -126,13 +126,15 @@
                             </td>
                             <td>{{$product->product_name}}</td>
                             <td>{{$product->size}}</td>
-                            <td>{{$product->price_1_day}}</td>
+                            <td class="currency">{{$product->price_1_day}}</td>
                             <td>{{$product->quantity_origin}}</td>
                             <td>{{$product->Category->cate_name ?? 'Chưa có Danh mục'}}</td>
                             <td>{{$product->updated_at}}</td>
                             <td class="">
-                                    <button type="button" data-url="/products/{{$product->id}}" data-id="{{$product->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$product->id}}">Xóa</button>
-                                    <button type="button" data-id="{{$product->id}}" class="btn btn-edit btnEditProduct btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                @if(auth()->user()->role->isAdmin())
+                                <button type="button" data-url="/products/{{$product->id}}" data-id="{{$product->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$product->id}}">Xóa</button>
+                                @endif
+                                <button type="button" data-id="{{$product->id}}" class="btn btn-edit btnEditProduct btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
                             </td>
 
                             <!-- Modal Delete -->

@@ -40,7 +40,7 @@ class UserController extends Controller
             $query->where('phone_number', 'LIKE', '%' . $request->input('search_phone') . '%');
         }
     
-        $users = $query->paginate(20);
+        $users = $query->orderByDesc('id')->paginate(20);
     
         return view('users.index', compact('users', 'roles'), [
             'title' => 'Tài khoản quản trị'

@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ChothueController;
+use App\Http\Controllers\DoanhthuController;
 use App\Http\Controllers\KhoController;
 use App\Http\Controllers\ProductController;
 
@@ -38,4 +39,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('chothues', ChothueController::class);
     Route::delete('/chothue_product/delete/{id}', [ChothueController::class, 'destroyProduct']);
 
+    Route::resource('doanhthus', DoanhthuController::class);
+    
 });

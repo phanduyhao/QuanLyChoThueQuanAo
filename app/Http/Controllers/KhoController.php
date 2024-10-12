@@ -26,7 +26,7 @@ class KhoController extends Controller
         $searchProductName = $request->input('search_product_name');
 
         // Lọc sản phẩm dựa trên tên sản phẩm nếu có yêu cầu tìm kiếm
-        $products = Product::where('Xoa', null)->get()->map(function ($product) {
+        $products = Product::where('Xoa', null)->orderBy('product_name')->get()->map(function ($product) {
             // Tính tổng số lượng đã nhập cho sản phẩm này
             $totalInStock = Kho::where('Xoa', null)
                                 ->where('id_product', $product->id)
@@ -41,7 +41,7 @@ class KhoController extends Controller
             return $product;
         });
 
-        $khos = Kho::where('Xoa', null)
+        $khos = Kho::where('Xoa', null)->orderByDesc('id')
         ->when($searchId, function ($query, $searchId) {
             return $query->where('id', $searchId);
         })
@@ -49,12 +49,12 @@ class KhoController extends Controller
             return $query->where('title', 'like', '%' . $searchKhoName . '%');
         })
         ->when($searchProductName, function ($query, $searchProductName) {
-            // Sử dụng whereHas để tìm kiếm theo tên sản phẩm liên kết với kho
             return $query->whereHas('product', function ($query) use ($searchProductName) {
                 $query->where('product_name', 'like', '%' . $searchProductName . '%');
             });
         })
         ->paginate($perPage);
+    
     
         // Tính số lượng rảnh và số lượng đang cho thuê cho từng kho
         foreach ($khos as $kho) {

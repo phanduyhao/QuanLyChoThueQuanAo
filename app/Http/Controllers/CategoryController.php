@@ -30,7 +30,7 @@ class CategoryController extends Controller
         }
     
         // Lấy danh sách các danh mục với phân trang và thêm các tham số tìm kiếm vào liên kết phân trang
-        $categories = $query->paginate($perPage)->appends($request->only('search_id', 'search_name'));
+        $categories = $query->orderByDesc('id')->paginate($perPage)->appends($request->only('search_id', 'search_name'));
     
         return view('categories.index', compact('categories'), [
             'title' => 'Quản lý danh mục'

@@ -53,6 +53,8 @@
                     </a>
                 </div>
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                <button type="button" data-id="" class="btn btn-success text-dark px-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#createchothue">Thêm mới hóa đơn</button>
+               
                     <!-- Search -->
                     <!-- /Search -->
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
@@ -125,6 +127,71 @@
                     </ul>
                 </div>
             </nav>
+            <div class="modal fade" id="createchothue" tabindex="-1" aria-labelledby="createchothueLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="createchothueLabel">Thêm mới hóa đơn</h1>
+                        </div>
+                        <div class="card-body">
+                            <div class="error">
+                                @include('error')
+                            </div>
+                            <form id="form_chothue_store" class="form-create" method='POST' action='{{route('chothues.store')}}'>
+                                @csrf
+                                <div class='mb-3'>
+                                    <label class='form-label' for='basic-default-name_customer'>Tên khách hàng</label>
+                                    <input type='text' class='form-control input-field' id='name_customer' placeholder='Nhập tên khách hàng' name='name_customer' data-require='Mời nhập tên khách hàng' value="{{ old('name_customer') }}" />
+                                </div>
+                                <div class='mb-3'>
+                                    <label class='form-label' for='basic-default-phone_number'>Số điện thoại</label>
+                                    <input type='text' class='form-control input-field' id='phone_number' placeholder='Nhập số điện thoại' name='phone_number' data-require='Mời nhập số điện thoại' value="{{ old('phone_number') }}" />
+                                </div>
+                            
+                                <div class='mb-3'>
+                                    <label class='form-label' for='basic-default-so_ngay_thue'>Số ngày thuê</label>
+                                    <div class="position-relative">
+                                        <input type='number' class='form-control input-field' id='so_ngay_thue' placeholder='Nhập số ngày thuê' name='so_ngay_thue' data-require='Mời nhập số ngày thuê' value="{{ old('so_ngay_thue') }}" />
+                                        {{-- <button type="button" class="btn btn-warning position-absolute top-0 end-0 bottom-0" id="updateTotalAmount">Cập nhật</button> <!-- Nút cập nhật tiền --> --}}
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3 product-item">
+                                    <label for="product">Sản phẩm</label>
+                                    <select class="form-control product-select" name="id_kho" id="id_product_theokho">
+                                        @foreach($product_theokhos as $product_theokho)
+                                            <option value="{{ $product_theokho->id }}" 
+                                                    data-price="{{ $product_theokho->Product->price_1_day }}" 
+                                                    data-available-quantity="{{ $product_theokho->available_quantity }}">
+                                                {{ $product_theokho->Product->product_name }} - {{ $product_theokho->title }} 
+                                                (Còn lại: {{ $product_theokho->available_quantity }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <input type="number" name="soluongconlai" id="soluongconlai" value="" hidden>
+                                    <input type="number" placeholder="Số lượng" id="quantity" name="quantity" class="form-control quantity-input mt-2 input-field" data-require="Mời nhập số lượng" />
+                                    <span class="text-danger d-none error-message">Số lượng nhập vào vượt quá số lượng còn lại!</span>
+                                </div>
+                                
+                                <div class='mb-3'>
+                                    <label class='form-label' for='basic-default-thanh_tien'>Thành tiền</label>
+                                    <input type='number' step="0.01" class='form-control d-none' id='thanh_tien_input' placeholder='Thành tiền' name='thanh_tien' readonly />
+                                    <h3 class="fw-bold text-info" id="thanh_tien"></h3>
+                                </div>
+                            
+                                <div class='mb-3'>
+                                    <label class='form-label' for='basic-default-khach_coc'>Khách cọc</label>
+                                    <input type='number' step="0.01" class='form-control input-field' id='khach_coc' placeholder='Nhập số tiền khách cọc' name='khach_coc' data-require='Mời nhập số tiền khách cọc' value="{{ old('khach_coc') }}" />
+                                </div>
+                            
+                                <div class="modal-footer">
+                                    <button type='submit' id="btn-themmoi" class='btn btn-success fw-semibold text-dark'>Thêm mới</button>
+                                    <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             @yield('contents')
         </div>
         <!-- / Layout page -->
@@ -137,7 +204,9 @@
 <!-- build:js assets/vendor/js/core.js -->
 
 </script>
+
 @include('footer')
+
 
 </body>
 </html>

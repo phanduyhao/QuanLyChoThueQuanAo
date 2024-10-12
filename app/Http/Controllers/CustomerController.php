@@ -38,7 +38,7 @@ class CustomerController extends Controller
             $query->where('phone_number', 'LIKE', '%' . $request->input('search_phone') . '%');
         }
     
-        $customers = $query->paginate(20);
+        $customers = $query->orderByDesc('id')->paginate(20);
     
         return view('customers.index', compact('customers'), [
             'title' => 'Tài khoản khách hàng'

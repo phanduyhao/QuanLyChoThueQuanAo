@@ -13,7 +13,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $perPage = 20; // Số bản ghi trên mỗi trang
-        $cates = Category::where('Xoa', null)->get(); // Lấy danh sách các danh mục
+        $cates = Category::where('Xoa', null)->orderBy('cate_name')->get(); // Lấy danh sách các danh mục
         
         // Tạo query cơ bản để lấy các sản phẩm chưa bị xóa
         $query = Product::where('Xoa', null);
@@ -34,7 +34,7 @@ class ProductController extends Controller
         }
     
         // Lấy danh sách sản phẩm với phân trang và thêm các tham số tìm kiếm vào liên kết phân trang
-        $products = $query->paginate($perPage)->appends($request->only('search_id', 'search_name', 'search_size', 'search_category'));
+        $products = $query->orderByDesc('id')->paginate($perPage)->appends($request->only('search_id', 'search_name', 'search_size', 'search_category'));
     
         return view('products.index', compact('products', 'cates'), [
             'title' => 'Quản lý sản phẩm'

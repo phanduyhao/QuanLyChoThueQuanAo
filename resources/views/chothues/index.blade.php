@@ -11,7 +11,7 @@
                 </div>
                 <div class="mb-3">
                     <div class="row">
-                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                        <div class="col-lg-2 col-sm-6 col-12 mb-3">
                             <input class="form-control shadow-none" type="number" name="search_id" placeholder="Tìm theo mã số..." value="{{ request('search_id') }}">
                         </div>
                         <div class="col-lg-3 col-sm-6 col-12 mb-3">
@@ -20,7 +20,10 @@
                         <div class="col-lg-3 col-sm-6 col-12 mb-3">
                             <input class="form-control shadow-none" type="text" name="search_employee" placeholder="Tìm theo nhân viên.." value="{{ request('search_employee') }}">
                         </div>
-                        <div class="col-lg-3 col-sm-6 col-12 mb-3">
+                        <div class="col-lg-2 col-sm-6 col-12 mb-3">
+                            <input class="form-control shadow-none" type="text" name="search_size" placeholder="Tìm theo kích thước..." value="{{ request('search_size') }}">
+                        </div>
+                        <div class="col-lg-2 col-sm-6 col-12 mb-3">
                             <select name="search_status" class="form-control">
                                 <option value="">Chọn trạng thái</option>
                                 <option value="1" {{ request('search_status') == '1' ? 'selected' : '' }}>Đang cho thuê</option>
@@ -109,7 +112,6 @@
                 </div>
             </div>
 
-
             <div class="table-responsive text-nowrap">
                 <table class="table">
                     <thead>
@@ -119,6 +121,7 @@
                         <th>Khách hàng</th>
                         <th>Sẳn phẩm</th>
                         <th>Số ngày thuê</th>
+                        <th>Số lượng</th>
                         <th>Thành tiền</th>
                         <th>Khách cọc</th>
                         <th>Trạng thái</th>
@@ -135,8 +138,9 @@
                             <td>{{$chothue->Customer->name}} - {{$chothue->Customer->phone_number}}</td>
                             <td>{{$chothue->Product->product_name}} - {{$chothue->Product->size}}</td>
                             <td>{{$chothue->so_ngay_thue}}</td>
-                            <td>{{$chothue->thanh_tien}}</td>
-                            <td>{{$chothue->khach_coc}}</td>
+                            <td>{{$chothue->quantity}}</td>
+                            <td class="currency">{{$chothue->thanh_tien}}</td>
+                            <td class="currency">{{$chothue->khach_coc}}</td>
                             <td>
                                 @if($chothue->trangthai == 1)
                                     <span class="text-warning fw-bold">Đang cho thuê</span>
@@ -147,8 +151,10 @@
                             <td>{{$chothue->Nhanvien->name}}</td>
                             <td>{{$chothue->updated_at}}</td>
                             <td class="">
-                                    <button type="button" data-url="/chothues/{{$chothue->id}}" data-id="{{$chothue->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$chothue->id}}">Xóa</button>
-                                    <button type="button" data-id="{{$chothue->id}}" class="btn btn-edit btnEditChothue btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                @if(auth()->user()->role->isAdmin())
+                                <button type="button" data-url="/chothues/{{$chothue->id}}" data-id="{{$chothue->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$chothue->id}}">Xóa</button>
+                                @endif
+                                <button type="button" data-id="{{$chothue->id}}" class="btn btn-edit btnEditChothue btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
                             </td>
 
                             <!-- Modal Delete -->

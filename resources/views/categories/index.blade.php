@@ -117,8 +117,10 @@
                             <td>{{$category->desc}}</td>
                             <td>{{$category->updated_at}}</td>
                             <td class="">
-                                    <button type="button" data-url="/categories/{{$category->id}}" data-id="{{$category->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$category->id}}">Xóa</button>
-                                    <button type="button" data-id="{{$category->id}}" class="btn btn-edit btnEditCategory btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                @if(auth()->user()->role->isAdmin())
+                                <button type="button" data-url="/categories/{{$category->id}}" data-id="{{$category->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$category->id}}">Xóa</button>
+                                @endif
+                                <button type="button" data-id="{{$category->id}}" class="btn btn-edit btnEditCategory btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
                             </td>
 
                             <!-- Modal Delete -->
@@ -129,7 +131,9 @@
                                             <h1 class="modal-title fs-5 text-wrap" id="deleteModal{{$category->id}}Label">Bạn có chắc chắn xóa Danh mục <b><u>{{$category->cate_name}}</u></b>  không ?</h1>
                                         </div>
                                         <div class="modal-footer">
+                                            @if(auth()->user()->role->isAdmin())
                                             <button class="delete-forever btn btn-danger" data-id="{{ $category->id }}">Xóa</button>
+                                            @endif
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                         </div>
                                     </div>

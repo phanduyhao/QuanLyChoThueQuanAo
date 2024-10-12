@@ -27,9 +27,10 @@ class ChothueController extends Controller
         $searchCustomer = $request->input('search_customer');
         $searchStatus = $request->input('search_status');
         $searchEmployee = $request->input('search_employee');
-    
+        $searchSize = $request->input('search_size'); 
+
         // Lọc các hóa đơn cho thuê dựa trên điều kiện tìm kiếm
-        $chothues = Chothue::where('Xoa', null)
+        $chothues = Chothue::where('Xoa', null)->orderByDesc('id')
             ->when($searchId, function ($query, $searchId) {
                 return $query->where('id', $searchId);
             })
@@ -47,10 +48,15 @@ class ChothueController extends Controller
                     $q->where('name', 'like', '%' . $searchEmployee . '%');
                 });
             })
+            ->when($searchSize, function ($query, $searchSize) {
+                return $query->whereHas('product', function ($q) use ($searchSize) {
+                    $q->where('size', 'like', '%' . $searchSize . '%');
+                });
+            })
             ->paginate($perPage);
     
         // Lấy danh sách các kho và tính toán số lượng còn lại của sản phẩm trong từng kho
-        $product_theokhos = Kho::where('Xoa', null)->get()->map(function ($kho) {
+        $product_theokhos = Kho::where('Xoa', null)->orderBy('title')->get()->map(function ($kho) {
             $totalRented = Chothue::where('Xoa', null)->where('id_kho', $kho->id)->sum('quantity');
             $availableQuantity = $kho->quantity - $totalRented;
             $kho->available_quantity = max(0, $availableQuantity);
@@ -129,7 +135,7 @@ class ChothueController extends Controller
 
         $chothue->save();
 
-        return redirect()->back()->with('success', 'Cho thuê đã được thêm thành công!');
+        return redirect()->route('chothues.index');
     }
 
     /**
@@ -206,7 +212,6 @@ class ChothueController extends Controller
             'khach_coc.numeric' => 'Khách cọc phải là một số!',
         ]);
     
-        // Kiểm tra xem khách hàng với số điện thoại đã tồn tại chưa
         $customer = Customer::where('phone_number', $request->phone_number)->first();
     
         if (!$customer) {
@@ -247,7 +252,11 @@ class ChothueController extends Controller
         $doanhthu = Doanhthu::where('id_chothue', $chothue->id)
             ->first();
         $doanhthu->id_kho = $request->id_kho;
-        $doanhthu->doanh_thu_thuc_te = $request->khach_coc;
+        if($chothue->trangthai == 0){
+            $doanhthu->doanh_thu_thuc_te = $doanhthu->doanh_thu_du_kien;
+        }else{
+            $doanhthu->doanh_thu_thuc_te = $request->khach_coc;
+        }
         $doanhthu->doanh_thu_du_kien = $request->thanh_tien;
         $doanhthu->save();
     

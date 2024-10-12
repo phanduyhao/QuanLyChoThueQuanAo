@@ -31,32 +31,34 @@
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Người dùng & Khách hàng</span>
         </li>
-        <li class='menu-item'>
-            <a href='{{route("roles.index")}}' class='menu-link'>
-                <i class='menu-icon tf-icons bx bxs-user-account'></i>
-                <div data-i18n='Layouts'>Quản lý quyền</div>
-            </a>
-            <ul class='menu-sub ms-4'>
-                <li class='menu-item'>
-                    <a href='{{route("roles.index")}}' class='menu-link'>
-                        <div data-i18n='Without menu'>Danh sách quyền</div>
-                    </a>
-                </li>
-            </ul>
+        @if(auth()->user()->role->isAdmin())
+            <li class='menu-item'>
+                <a href='{{route("roles.index")}}' class='menu-link'>
+                    <i class='menu-icon tf-icons bx bxs-user-account'></i>
+                    <div data-i18n='Layouts'>Quản lý quyền</div>
+                </a>
+                <ul class='menu-sub ms-4'>
+                    <li class='menu-item'>
+                        <a href='{{route("roles.index")}}' class='menu-link'>
+                            <div data-i18n='Without menu'>Danh sách quyền</div>
+                        </a>
+                    </li>
+                </ul>
 
-        <li class='menu-item'>
-            <a href='{{route("users.index")}}' class='menu-link '>
-                <i class='menu-icon tf-icons bx bxs-user-account'></i>
-                <div data-i18n='Layouts'>Tài khoản quản trị</div>
-            </a>
-            <ul class='menu-sub ms-4'>
-                <li class='menu-item'>
-                    <a href='{{route("users.index")}}' class='menu-link'>
-                        <div data-i18n='Without menu'>Tài khoản quản trị</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
+            <li class='menu-item'>
+                <a href='{{route("users.index")}}' class='menu-link '>
+                    <i class='menu-icon tf-icons bx bxs-user-account'></i>
+                    <div data-i18n='Layouts'>Tài khoản quản trị</div>
+                </a>
+                <ul class='menu-sub ms-4'>
+                    <li class='menu-item'>
+                        <a href='{{route("users.index")}}' class='menu-link'>
+                            <div data-i18n='Without menu'>Tài khoản quản trị</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endif
         <li class='menu-item'>
             <a href='{{route("customers.index")}}' class='menu-link '>
                 <i class='menu-icon tf-icons bx bxs-user-account'></i>
@@ -144,14 +146,14 @@
             </ul>
         </li>
         <li class='menu-item'>
-            <a href='{{route("chothues.index")}}' class='menu-link'>
+            <a href='{{route("doanhthus.index")}}' class='menu-link'>
                 <i class='menu-icon tf-icons bx bx-food-menu'></i>
-                <div data-i18n='Layouts'>Nhập kho</div>
+                <div data-i18n='Layouts'>Doanh thu theo kho</div>
             </a>
             <ul class='menu-sub ms-4'>
                 <li class='menu-item'>
-                    <a href='{{route("chothues.index")}}' class='menu-link'>
-                        <div data-i18n='Without menu'>Nhập kho</div>
+                    <a href='{{route("doanhthus.index")}}' class='menu-link'>
+                        <div data-i18n='Without menu'>Doanh thu theo kho</div>
                     </a>
                 </li>
 

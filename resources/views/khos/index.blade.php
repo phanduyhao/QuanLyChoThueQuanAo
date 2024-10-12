@@ -151,13 +151,16 @@
                             <td>{{$kho->id}}</td>
                             <td>{{$kho->title}}</td>
                             <td>{{$kho->Product->product_name??"Chưa có sản phẩm"}} - {{$kho->Product->size}}</td>
-                            <td>{{ $kho->total_quantity }}</td> <!-- Tổng số lượng -->
-                            <td>{{ $kho->quantity_available }}</td> <!-- Số lượng rảnh -->
-                            <td>{{ $kho->quantity_rented }}</td> <!-- Số lượng đang cho thuê -->                            <td>{{$kho->desc}}</td>
+                            <td>{{ $kho->total_quantity }}</td> 
+                            <td>{{ $kho->quantity_available }}</td> 
+                            <td>{{ $kho->quantity_rented }}</td>                             
+                            <td>{{$kho->desc}}</td>
                             <td>{{$kho->updated_at}}</td>
                             <td class="">
-                                    <button type="button" data-url="/khos/{{$kho->id}}" data-id="{{$kho->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$kho->id}}">Xóa</button>
-                                    <button type="button" data-id="{{$kho->id}}" class="btn btn-edit btnEditKho btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                @if(auth()->user()->role->isAdmin())
+                                <button type="button" data-url="/khos/{{$kho->id}}" data-id="{{$kho->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$kho->id}}">Xóa</button>
+                                @endif
+                                <button type="button" data-id="{{$kho->id}}" class="btn btn-edit btnEditKho btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
                             </td>
 
                             <!-- Modal Delete -->

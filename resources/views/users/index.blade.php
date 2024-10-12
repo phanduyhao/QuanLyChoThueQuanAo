@@ -149,9 +149,9 @@
                             <td>{{$user->updated_at}}</td>
                             @if(auth()->user()->role->isAdmin())
                                 <td class="">
-                                        <button type="button" data-url="/users/{{$user->id}}" data-id="{{$user->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$user->id}}">Xóa</button>
-                                        <button type="button" data-id="{{$user->id}}" class="btn btn-edit btnEditUser btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
-                                    </td>
+                                    <button type="button" data-url="/users/{{$user->id}}" data-id="{{$user->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$user->id}}">Xóa</button>
+                                    <button type="button" data-id="{{$user->id}}" class="btn btn-edit btnEditUser btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                </td>
                             @endif
 
                             <!-- Modal Delete -->

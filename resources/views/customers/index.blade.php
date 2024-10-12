@@ -124,8 +124,10 @@
                             <td>{{$customer->phone_number}}</td>
                             <td>{{$customer->updated_at}}</td>
                             <td class="">
-                                    <button type="button" data-url="/customers/{{$customer->id}}" data-id="{{$customer->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$customer->id}}">Xóa</button>
-                                    <button type="button" data-id="{{$customer->id}}" class="btn btn-edit btnEditCustomer btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
+                                @if(auth()->user()->role->isAdmin())
+                                <button type="button" data-url="/customers/{{$customer->id}}" data-id="{{$customer->id}}" class="btn btn-danger btnDeleteAsk px-2 me-2 py-1 fw-bolder" data-bs-toggle="modal" data-bs-target="#deleteModal{{$customer->id}}">Xóa</button>
+                                @endif
+                                <button type="button" data-id="{{$customer->id}}" class="btn btn-edit btnEditCustomer btn-info text-dark px-2 py-1 fw-bolder">Sửa</button>
                             </td>
 
                             <!-- Modal Delete -->
