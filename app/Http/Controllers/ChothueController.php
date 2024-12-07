@@ -277,6 +277,28 @@ class ChothueController extends Controller
         return redirect()->back()->with('success', 'Cập nhật thành công!');
     }
     
+    public function autocompleteCustomers(Request $request)
+    {
+        $search = $request->get('term');
+    
+        // Tìm khách hàng theo tên
+        $customers = Customer::where('name', 'LIKE', '%' . $search . '%')
+            ->limit(10)
+            ->get();
+    
+        $result = [];
+        foreach ($customers as $customer) {
+            $result[] = [
+                'id' => $customer->id,
+                'value' => $customer->name, // Hiển thị tên khách hàng trong danh sách
+                'phone_number' => $customer->phone_number // Trả về số điện thoại
+            ];
+        }
+        return response()->json($result);
+    }
+
+
+
     
     /**
      * Remove the specified resource from storage.

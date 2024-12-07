@@ -45,5 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('settings', SettingController::class);
     Route::post('settings/update', [SettingController::class, 'update'])->name('update');
 
+    Route::get('/autocomplete-customers', [ChothueController::class, 'autocompleteCustomers']);
+
     
 });

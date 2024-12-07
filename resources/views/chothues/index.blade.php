@@ -559,6 +559,30 @@
 
                 $('#XuatHdChothue').modal('show');
             });
+
+            if ($.fn.autocomplete) {
+                $('#name_customer').autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url: "{{ url('/autocomplete-customers') }}",
+                            data: {
+                                term: request.term
+                            },
+                            dataType: "json",
+                            success: function(data) {
+                                response(data);
+                            }
+                        });
+                    },
+                    select: function(event, ui) {
+                        $('#name_customer').val(ui.item.value);
+                        $('#phone_number').val(ui.item.phone_number);
+                        return false;
+                    }
+                });
+            } else {
+        console.error('Autocomplete function is not available.');
+    }
         });
     </script>
 @endsection
